@@ -4,6 +4,8 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable, :omniauthable, omniauth_providers: [:spotify]
 
+  serialize :top_tracks, JSON
+
   def self.find_for_oauth(auth)
     # Create the user params
     user_params = auth.slice("provider", "uid")
@@ -25,6 +27,8 @@ class User < ApplicationRecord
     # Else, create a new user with the params that come from the app callback
     else
       user = User.new(user_params)
+      spotify_user = RSpotify::User.new(JSON.parse(auth.to_json))
+      user.top_tracks = spotify_user.top_tracks(time_range: 'short_term')
       # create a fake password for validation
       user.password = Devise.friendly_token[0, 20]
       user.save
