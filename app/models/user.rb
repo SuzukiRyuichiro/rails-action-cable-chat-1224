@@ -5,7 +5,6 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable, :omniauthable, omniauth_providers: [:spotify]
 
   def self.find_for_oauth(auth)
-    debugger
     # Create the user params
     user_params = auth.slice("provider", "uid")
     user_params.merge! auth.info.slice("email")
